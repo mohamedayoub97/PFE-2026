@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MPPT-IA Photovoltaïque — Essalami 2025</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImJnIiBjeD0iNDAlIiBjeT0iMzUlIiByPSI2NSUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkNEMzREIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0Q5NzcwNiIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPHBvbHlnb24gcG9pbnRzPSIzMiw0IDU2LDE3IDU2LDQ3IDMyLDYwIDgsNDcgOCwxNyIgZmlsbD0idXJsKCNiZykiIHN0cm9rZT0iI0ZFRjNDNyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8bGluZSB4MT0iMzIiIHkxPSIxNCIgeDI9IjMyIiB5Mj0iNTAiIHN0cm9rZT0iIzc4MzUwRiIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSIxNCIgeTE9IjI0IiB4Mj0iNTAiIHkyPSI0MCIgc3Ryb2tlPSIjNzgzNTBGIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGxpbmUgeDE9IjE0IiB5MT0iNDAiIHgyPSI1MCIgeTI9IjI0IiBzdHJva2U9IiM3ODM1MEYiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSI2LjUiIGZpbGw9IiNGRkZCRUIiIHN0cm9rZT0iI0Q5NzcwNiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIyLjUiIGZpbGw9IiNGNTlFMEIiLz4KPC9zdmc+Cg==">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#030508}
+canvas{display:block;cursor:grab}
+canvas.dragging{cursor:grabbing}
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#topbar{pointer-events:all;position:absolute;top:0;left:0;right:0;height:60px;background:rgba(3,5,8,0.88);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(20px);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
+#logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:#F59E0B;letter-spacing:0.5px;white-space:nowrap;line-height:1.2}
+#logo span{display:block;color:rgba(255,255,255,0.3);font-weight:300;font-size:10px;letter-spacing:1.5px;margin-top:1px}
+#search-wrap{position:relative;flex:1;max-width:280px}
+#search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:0.3;pointer-events:none}
+#search{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 11px 7px 34px;color:#E2E8F0;font-family:'Space Mono',monospace;font-size:11px;outline:none;transition:border-color .2s}
+#search:focus{border-color:rgba(245,158,11,0.5)}
+#search::placeholder{color:rgba(255,255,255,0.18)}
+#controls{display:flex;gap:6px;margin-left:auto;align-items:center}
+.ctrl-btn{pointer-events:all;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:rgba(255,255,255,0.45);font-size:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-family:'Space Mono',monospace;flex-shrink:0}
+.ctrl-btn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.25)}
+.ctrl-btn.ref-btn{width:auto;padding:0 12px;font-size:11px;letter-spacing:0.5px;font-family:'Space Grotesk',sans-serif;font-weight:600;color:#F59E0B;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.06)}
+.ctrl-btn.ref-btn:hover{background:rgba(245,158,11,0.15);border-color:#F59E0B;color:#FCD34D}
+#hint{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.17);white-space:nowrap}
+
+/* Detail panel */
+#panel{pointer-events:all;position:absolute;right:0;top:60px;width:300px;height:calc(100% - 60px);background:rgba(4,6,12,0.94);border-left:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(24px);transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:18px}
+#panel.open{transform:translateX(0)}
+#panel::-webkit-scrollbar{width:3px}
+#panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.panel-type{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:0.35;margin-bottom:5px}
+.panel-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;line-height:1.2;margin-bottom:4px}
+.panel-sub{font-family:'Space Grotesk',sans-serif;font-size:11px;color:rgba(255,255,255,0.38);margin-bottom:14px;line-height:1.5}
+.pdiv{height:1px;background:rgba(255,255,255,0.07);margin:13px 0}
+.plabel{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:7px}
+.fact-item{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px}
+.fact-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.fact-text{font-family:'Space Grotesk',sans-serif;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.5}
+.formula-box{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:7px;padding:10px 12px;font-family:'Space Mono',monospace;font-size:10px;color:#93C5FD;line-height:1.65;word-break:break-all;margin-top:3px}
+.panel-close{position:absolute;top:14px;right:14px;width:26px;height:26px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,0.35);font-size:12px;transition:all .15s}
+.panel-close:hover{background:rgba(255,255,255,0.12);color:#fff}
+
+/* References modal */
+#ref-modal{pointer-events:all;position:fixed;inset:0;background:rgba(2,4,8,0.97);backdrop-filter:blur(20px);z-index:200;display:none;flex-direction:column}
+#ref-modal.open{display:flex}
+#ref-header{flex-shrink:0;padding:20px 28px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:16px}
+#ref-header h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:#F59E0B}
+#ref-header span{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px}
+.ref-close{margin-left:auto;width:32px;height:32px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,0.4);font-size:16px;transition:all .15s;flex-shrink:0}
+.ref-close:hover{background:rgba(255,255,255,0.12);color:#fff}
+#ref-search-wrap{padding:14px 28px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;display:flex;gap:10px;align-items:center}
+#ref-search{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 14px;color:#E2E8F0;font-family:'Space Mono',monospace;font-size:11px;outline:none}
+#ref-search:focus{border-color:rgba(245,158,11,0.4)}
+#ref-search::placeholder{color:rgba(255,255,255,0.18)}
+.ref-filter-btns{display:flex;gap:6px;flex-shrink:0}
+.rfilter{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.4);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;transition:all .15s}
+.rfilter:hover,.rfilter.active{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.4);color:#F59E0B}
+#ref-body{flex:1;overflow-y:auto;padding:16px 28px 28px}
+#ref-body::-webkit-scrollbar{width:4px}
+#ref-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.ref-section{margin-bottom:24px}
+.ref-section-title{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.ref-item{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px 16px;margin-bottom:8px;transition:all .2s;cursor:default}
+.ref-item:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)}
+.ref-item.hidden{display:none}
+.ref-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:7px}
+.ref-num{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.2);flex-shrink:0;min-width:28px;padding-top:2px}
+.ref-title-block{flex:1}
+.ref-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12px;color:#E2E8F0;line-height:1.5;margin-bottom:3px}
+.ref-title a{color:inherit;text-decoration:none}
+.ref-title a:hover{color:#F59E0B;text-decoration:underline}
+.ref-authors{font-family:'Space Grotesk',sans-serif;font-size:11px;color:rgba(255,255,255,0.38);margin-bottom:2px}
+.ref-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:5px}
+.ref-journal{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.04);padding:2px 7px;border-radius:4px;border:1px solid rgba(255,255,255,0.07)}
+.ref-year{font-family:'Space Mono',monospace;font-size:9px;color:#7DD3FC;background:rgba(56,189,248,0.08);padding:2px 7px;border-radius:4px;border:1px solid rgba(56,189,248,0.15)}
+.ref-doi-link{font-family:'Space Mono',monospace;font-size:9px;color:#86EFAC;background:rgba(134,239,172,0.07);padding:2px 8px;border-radius:4px;border:1px solid rgba(134,239,172,0.15);text-decoration:none;transition:all .15s}
+.ref-doi-link:hover{background:rgba(134,239,172,0.15);color:#4ADE80}
+.ref-chapters{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.ref-ch-tag{font-family:'Space Mono',monospace;font-size:8px;padding:1px 6px;border-radius:3px}
+.stars{color:#F59E0B;font-size:11px;flex-shrink:0;padding-top:2px;letter-spacing:-1px}
+.star-label{font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,0.25);margin-left:4px}
+.importance-bar{display:flex;align-items:center;gap:6px;margin-top:6px}
+.imp-bar-bg{flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden}
+.imp-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#F59E0B,#FCD34D)}
+
+/* Legend */
+#legend{pointer-events:all;position:absolute;bottom:18px;left:18px;background:rgba(4,6,12,0.82);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:11px 14px;backdrop-filter:blur(12px)}
+.legend-title{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:7px}
+.legend-item{display:flex;align-items:center;margin-bottom:4px}
+.legend-circle{width:9px;height:9px;border-radius:50%;margin-right:7px;flex-shrink:0}
+.legend-text{font-family:'Space Grotesk',sans-serif;font-size:10px;color:rgba(255,255,255,0.4)}
+#counter{pointer-events:all;position:absolute;bottom:18px;right:18px;font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.2);text-align:right;line-height:1.6}
+#loading{position:fixed;inset:0;background:#030508;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .6s}
+#loading.hidden{opacity:0;pointer-events:none}
+.load-ring{width:48px;height:48px;border-radius:50%;border:2px solid rgba(245,158,11,0.15);border-top-color:#F59E0B;animation:spin 1s linear infinite;margin-bottom:18px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-text{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:2px;animation:blk 1.5s ease-in-out infinite}
+@keyframes blk{0%,100%{opacity:.28}50%{opacity:.65}}
+</style>
+</head>
+<body>
+<div id="loading"><div class="load-ring"></div><div class="load-text">INITIALISATION...</div></div>
+<canvas id="canvas"></canvas>
+
+<!-- UI OVERLAY -->
+<div id="ui">
+  <div id="topbar">
+    <div id="logo">MPPT · IA PHOTOVOLTAÏQUE<span>ESSALAMI 2025 · ENIGA / CRTEN · BORJ CÉDRIA</span></div>
+    <div id="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search" type="text" placeholder="Rechercher concept, nœud, équation…">
+    </div>
+    <div id="controls">
+      <div class="ctrl-btn" id="btn-reset" title="Réinitialiser">⟳</div>
+      <div class="ctrl-btn" id="btn-expand" title="Déployer tout">⊞</div>
+      <div class="ctrl-btn" id="btn-collapse" title="Replier">⊟</div>
+      <div class="ctrl-btn ref-btn" id="btn-refs">📚 RÉFÉRENCES</div>
+    </div>
+    <div id="hint">molette·zoom — clic+glisser·pan — clic nœud·détails</div>
+  </div>
+
+  <!-- Node detail panel -->
+  <div id="panel">
+    <div class="panel-close" id="panel-close">✕</div>
+    <div id="panel-content"></div>
+  </div>
+
+  <!-- Legend -->
+  <div id="legend">
+    <div class="legend-title">Légende</div>
+    <div class="legend-item"><div class="legend-circle" style="background:#F59E0B"></div><div class="legend-text">Racine — Projet</div></div>
+    <div class="legend-item"><div class="legend-circle" style="background:#38BDF8"></div><div class="legend-text">Ch.1 — État de l'art</div></div>
+    <div class="legend-item"><div class="legend-circle" style="background:#FBBF24"></div><div class="legend-text">Ch.2 — Gisement solaire</div></div>
+    <div class="legend-item"><div class="legend-circle" style="background:#34D399"></div><div class="legend-text">Ch.3 — Modélisation PV</div></div>
+    <div class="legend-item"><div class="legend-circle" style="background:#F87171"></div><div class="legend-text">Ch.4 — MPPT conventionnel</div></div>
+    <div class="legend-item"><div class="legend-circle" style="background:#A78BFA"></div><div class="legend-text">Ch.5 — Deep Learning</div></div>
+  </div>
+  <div id="counter"></div>
+</div>
+
+<!-- REFERENCES MODAL -->
+<div id="ref-modal">
+  <div id="ref-header">
+    <div>
+      <h2>📚 Bibliographie complète</h2>
+      <span>Mohamed Ayoub Essalami · ENIGA/CRTEn · 2025–2026 · 68 références</span>
+    </div>
+    <div class="ref-close" id="ref-modal-close">✕</div>
+  </div>
+  <div id="ref-search-wrap">
+    <input id="ref-search" type="text" placeholder="Filtrer par auteur, titre, journal, DOI…">
+    <div class="ref-filter-btns">
+      <div class="rfilter active" data-filter="all">TOUT</div>
+      <div class="rfilter" data-filter="5">★★★★★</div>
+      <div class="rfilter" data-filter="4">★★★★</div>
+      <div class="rfilter" data-filter="3">★★★</div>
+      <div class="rfilter" data-filter="2">★★</div>
+      <div class="rfilter" data-filter="1">★</div>
+    </div>
+  </div>
+  <div id="ref-body">
+    <div id="ref-list"></div>
+  </div>
+</div>
+
+<script>
+// ── REFERENCES DATA ────────────────────────────────────────────────────────
+const REFS=[
+{n:1,key:'villalva2009',stars:5,authors:'Villalva M.G., Gazoli J.R., Filho E.R.',title:'Comprehensive Approach to Modeling and Simulation of Photovoltaic Arrays',journal:'IEEE Trans. Power Electronics',year:2009,doi:'10.1109/TPEL.2009.2013862',url:'https://doi.org/10.1109/TPEL.2009.2013862',chapters:['Ch.1','Ch.3','Ch.4'],cat:'Modélisation PV',importance:100},
+{n:2,key:'esram2007',stars:5,authors:'Esram T., Chapman P.L.',title:'Comparison of Photovoltaic Array Maximum Power Point Tracking Techniques',journal:'IEEE Trans. Energy Conversion',year:2007,doi:'10.1109/TEC.2006.874230',url:'https://doi.org/10.1109/TEC.2006.874230',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:100},
+{n:3,key:'hochreiter1997',stars:5,authors:'Hochreiter S., Schmidhuber J.',title:'Long Short-Term Memory',journal:'Neural Computation',year:1997,doi:'10.1162/neco.1997.9.8.1735',url:'https://doi.org/10.1162/neco.1997.9.8.1735',chapters:['Ch.1','Ch.5'],cat:'IA / Deep Learning',importance:100},
+{n:4,key:'Shockley1961',stars:5,authors:'Shockley W., Queisser H.J.',title:'Detailed Balance Limit of Efficiency of p-n Junction Solar Cells',journal:'Journal of Applied Physics',year:1961,doi:'10.1063/1.1736034',url:'https://doi.org/10.1063/1.1736034',chapters:['Ch.1','Ch.3'],cat:'Physique PV',importance:98},
+{n:5,key:'ishaque2012ddm',stars:5,authors:'Ishaque K., Salam Z., Syafaruddin',title:'A Comprehensive MATLAB/Simulink PV System Simulator with Partial Shading Capability Based on Two-Diode Model',journal:'Solar Energy',year:2011,doi:'10.1016/j.solener.2011.06.008',url:'https://doi.org/10.1016/j.solener.2011.06.008',chapters:['Ch.1','Ch.3'],cat:'Modélisation PV',importance:96},
+{n:6,key:'Sengupta2018',stars:5,authors:'Sengupta M., Xie Y., Lopez A. et al.',title:'The National Solar Radiation Data Base (NSRDB)',journal:'Renewable & Sustainable Energy Reviews',year:2018,doi:'10.1016/j.rser.2018.03.003',url:'https://doi.org/10.1016/j.rser.2018.03.003',chapters:['Ch.5'],cat:'Données / Météo',importance:95},
+{n:7,key:'mirjalili2014gwo',stars:4,authors:'Mirjalili S., Mirjalili S.M., Lewis A.',title:'Grey Wolf Optimizer',journal:'Advances in Engineering Software',year:2014,doi:'10.1016/j.advengsoft.2013.12.007',url:'https://doi.org/10.1016/j.advengsoft.2013.12.007',chapters:['Ch.1'],cat:'Méta-heuristique',importance:88},
+{n:8,key:'kennedy1995pso',stars:4,authors:'Kennedy J., Eberhart R.',title:'Particle Swarm Optimization',journal:'IEEE ICNN Proceedings',year:1995,doi:'10.1109/ICNN.1995.488968',url:'https://doi.org/10.1109/ICNN.1995.488968',chapters:['Ch.1'],cat:'Méta-heuristique',importance:86},
+{n:9,key:'DeSoto2006',stars:4,authors:'De Soto W., Klein S.A., Beckman W.A.',title:'Improvement and Validation of a Model for Photovoltaic Array Performance',journal:'Solar Energy',year:2006,doi:'10.1016/j.solener.2005.04.029',url:'https://doi.org/10.1016/j.solener.2005.04.029',chapters:['Ch.1','Ch.3'],cat:'Modélisation PV',importance:85},
+{n:10,key:'roy2024lstm',stars:4,authors:'Roy B. et al.',title:'Harnessing Deep Learning for Enhanced MPPT in Solar PV Systems: an LSTM Approach Using Real-World Data',journal:'Electricity',year:2024,doi:'10.3390/electricity5040043',url:'https://doi.org/10.3390/electricity5040043',chapters:['Ch.1','Ch.5'],cat:'IA / Deep Learning',importance:84},
+{n:11,key:'irena2025',stars:4,authors:'IRENA',title:'Renewable Capacity Statistics 2025',journal:'International Renewable Energy Agency',year:2025,url:'https://www.irena.org/Publications/2025/Apr/Renewable-capacity-statistics-2025',chapters:['Ch.1'],cat:'Contexte Énergie',importance:82},
+{n:12,key:'Vaswani2017',stars:4,authors:'Vaswani A., Shazeer N., Parmar N. et al.',title:'Attention Is All You Need',journal:'NeurIPS 2017',year:2017,url:'https://arxiv.org/abs/1706.03762',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:80},
+{n:13,key:'katche2023',stars:4,authors:'Katche M.L., Makokha A.B., Zachary S.O., Adaramola M.S.',title:'A Comprehensive Review of Maximum Power Point Tracking (MPPT) Techniques Used in Solar PV Systems',journal:'Energies',year:2023,doi:'10.3390/en16052206',url:'https://doi.org/10.3390/en16052206',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:79},
+{n:14,key:'Femia2005',stars:4,authors:'Femia N., Petrone G., Spagnuolo G., Vitelli M.',title:'Optimization of Perturb and Observe Maximum Power Point Tracking Method',journal:'IEEE Trans. Power Electronics',year:2005,doi:'10.1109/TPEL.2005.850975',url:'https://doi.org/10.1109/TPEL.2005.850975',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:78},
+{n:15,key:'He2016',stars:4,authors:'He K., Zhang X., Ren S., Sun J.',title:'Deep Residual Learning for Image Recognition',journal:'IEEE CVPR 2016',year:2016,doi:'10.1109/CVPR.2016.90',url:'https://doi.org/10.1109/CVPR.2016.90',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:77},
+{n:16,key:'Green2003',stars:4,authors:'Green M.A.',title:'Solar Cells: Operating Principles, Technology and System Applications',journal:'UNSW Press',year:2003,url:'https://www.worldcat.org/title/solar-cells',chapters:['Ch.1','Ch.3'],cat:'Physique PV',importance:76},
+{n:17,key:'Haykin2009',stars:4,authors:'Haykin S.',title:'Neural Networks and Learning Machines (3rd ed.)',journal:'Pearson Prentice Hall',year:2009,url:'https://www.pearson.com/us/higher-education/product/Haykin-Neural-Networks-and-Learning-Machines-3rd-Edition/9780131471399.html',chapters:['Ch.1','Ch.5'],cat:'IA / Deep Learning',importance:75},
+{n:18,key:'Sera2013',stars:4,authors:'Sera D., Mathe L., Kerekes T., Spataru S.V., Teodorescu R.',title:'On the Perturb-and-Observe and Incremental Conductance MPPT Methods for PV Systems',journal:'IEEE Journal of Photovoltaics',year:2013,doi:'10.1109/JPHOTOV.2013.2261118',url:'https://doi.org/10.1109/JPHOTOV.2013.2261118',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:74},
+{n:19,key:'Ishaque2013',stars:4,authors:'Ishaque K., Salam Z.',title:'A Review of Maximum Power Point Tracking Techniques of PV System for Uniform Insolation and Partial Shading Condition',journal:'Renewable & Sustainable Energy Reviews',year:2013,doi:'10.1016/j.rser.2012.11.032',url:'https://doi.org/10.1016/j.rser.2012.11.032',chapters:['Ch.1','Ch.4'],cat:'MPPT Ombrage',importance:73},
+{n:20,key:'nishioka2007',stars:4,authors:'Nishioka K., Sakitani N., Uraoka Y., Fuyuki T.',title:'Analysis of Multicrystalline Silicon Solar Cells by Modified 3-Diode Equivalent Circuit Model',journal:'Solar Energy Materials and Solar Cells',year:2007,doi:'10.1016/j.solmat.2007.04.009',url:'https://doi.org/10.1016/j.solmat.2007.04.009',chapters:['Ch.1','Ch.3'],cat:'Modélisation PV',importance:72},
+{n:21,key:'Kingma2015',stars:3,authors:'Kingma D.P., Ba J.',title:'Adam: A Method for Stochastic Optimization',journal:'ICLR 2015',year:2015,url:'https://arxiv.org/abs/1412.6980',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:68},
+{n:22,key:'Chen2016',stars:3,authors:'Chen T., Guestrin C.',title:'XGBoost: A Scalable Tree Boosting System',journal:'ACM KDD 2016',year:2016,doi:'10.1145/2939672.2939785',url:'https://doi.org/10.1145/2939672.2939785',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:67},
+{n:23,key:'Karami2016',stars:3,authors:'Karami N., Moubayed N., Outbib R.',title:'General Review and Classification of Different MPPT Techniques',journal:'Renewable & Sustainable Energy Reviews',year:2016,doi:'10.1016/j.rser.2016.09.082',url:'https://doi.org/10.1016/j.rser.2016.09.082',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:66},
+{n:24,key:'Subudhi2013',stars:3,authors:'Subudhi B., Pradhan R.',title:'A Comparative Study on Maximum Power Point Tracking Techniques for Photovoltaic Power Systems',journal:'IEEE Trans. Sustainable Energy',year:2013,doi:'10.1109/TSTE.2012.2202294',url:'https://doi.org/10.1109/TSTE.2012.2202294',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:65},
+{n:25,key:'nature2026mppt',stars:3,authors:'Alahmad A. et al.',title:'MPPT Algorithms for Grid-Connected Solar Systems Including Deep Learning Approaches',journal:'Scientific Reports (Nature)',year:2026,doi:'10.1038/s41598-026-36321-8',url:'https://doi.org/10.1038/s41598-026-36321-8',chapters:['Ch.1','Ch.5'],cat:'IA / Deep Learning',importance:64},
+{n:26,key:'mdpi2024mppt',stars:3,authors:'Boutechia H., Messalti S., Harrag A.',title:'Comparative Evaluation of Traditional and Advanced Algorithms for PV Systems in Partial Shading Conditions',journal:'AI (MDPI)',year:2024,doi:'10.3390/ai4040027',url:'https://doi.org/10.3390/ai4040027',chapters:['Ch.1','Ch.4'],cat:'MPPT Ombrage',importance:63},
+{n:27,key:'hussein1995',stars:3,authors:'Hussein K.H., Muta I., Hoshino T., Osakada M.',title:'Maximum Photovoltaic Power Tracking: An Algorithm for Rapidly Changing Atmospheric Conditions',journal:'IEE Proc. Generation, Transmission & Distribution',year:1995,doi:'10.1049/ip-gtd:19951577',url:'https://doi.org/10.1049/ip-gtd:19951577',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:62},
+{n:28,key:'liu2008',stars:3,authors:'Liu F., Duan S., Liu F., Liu B., Kang Y.',title:'A Variable Step Size INC MPPT Method for PV Systems',journal:'IEEE Trans. Industrial Electronics',year:2008,doi:'10.1109/TIE.2008.920550',url:'https://doi.org/10.1109/TIE.2008.920550',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:61},
+{n:29,key:'yap2020ann',stars:3,authors:'Yap K.Y., Sarimuthu C.R., Lim J.M.Y.',title:'Artificial Intelligence Based MPPT Techniques for Solar Power System: A Review',journal:'Journal of Modern Power Systems and Clean Energy',year:2020,doi:'10.35833/MPCE.2020.000159',url:'https://doi.org/10.35833/MPCE.2020.000159',chapters:['Ch.1'],cat:'IA / Deep Learning',importance:60},
+{n:30,key:'melhaoui2025',stars:3,authors:'Melhaoui M. et al.',title:'Hybrid Fuzzy Logic Approach for Enhanced MPPT Control in PV Systems',journal:'Scientific Reports',year:2025,doi:'10.1038/s41598-025-03154-w',url:'https://doi.org/10.1038/s41598-025-03154-w',chapters:['Ch.1'],cat:'Méta-heuristique',importance:59},
+{n:31,key:'Abdel2018LSTM',stars:3,authors:'Abdel-Nasser M., Mahmoud K.',title:'Accurate Photovoltaic Power Forecasting Models Using Deep LSTM-RNN',journal:'Neural Computing and Applications',year:2018,doi:'10.1007/s00521-017-3225-z',url:'https://doi.org/10.1007/s00521-017-3225-z',chapters:['Ch.1','Ch.5'],cat:'IA / Deep Learning',importance:58},
+{n:32,key:'Gao2019LSTM',stars:3,authors:'Gao M., Yang H., Wang Q., Liu H.',title:'Solar Irradiance Forecast Using a Recurrent Neural Network Combining the Deep Neural Network',journal:'Energies',year:2019,doi:'10.3390/en12152788',url:'https://doi.org/10.3390/en12152788',chapters:['Ch.1','Ch.5'],cat:'IA / Deep Learning',importance:57},
+{n:33,key:'Zhang2021AIPVReview',stars:3,authors:'Zhang C., Chen L., Wan L., Peng K.',title:'Artificial Intelligence for PV Forecasting and Control: A Comprehensive Review',journal:'Renewable & Sustainable Energy Reviews',year:2021,doi:'10.1016/j.rser.2021.111357',url:'https://doi.org/10.1016/j.rser.2021.111357',chapters:['Ch.1','Ch.5'],cat:'IA / Deep Learning',importance:56},
+{n:34,key:'Souissi2020',stars:3,authors:'Souissi A., Hamouda M., Ammous A.',title:'Experimental Study of Photovoltaic Module Performance Under North African Climate Conditions',journal:'Int. J. Renewable Energy Research',year:2020,url:'https://www.ijrer.org/',chapters:['Ch.1','Ch.2'],cat:'Contexte Tunisie',importance:55},
+{n:35,key:'Ioffe2015',stars:3,authors:'Ioffe S., Szegedy C.',title:'Batch Normalization: Accelerating Deep Network Training',journal:'ICML 2015',year:2015,url:'https://arxiv.org/abs/1502.03167',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:54},
+{n:36,key:'Srivastava2014',stars:3,authors:'Srivastava N., Hinton G., Krizhevsky A., Sutskever I., Salakhutdinov R.',title:'Dropout: A Simple Way to Prevent Neural Networks from Overfitting',journal:'Journal of Machine Learning Research',year:2014,url:'https://jmlr.org/papers/v15/srivastava14a.html',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:53},
+{n:37,key:'Elbaset2014',stars:3,authors:'Elbaset A.A., Ali H., Abd-El Sattar M.',title:'Novel Seven-Parameter Model for Photovoltaic Modules',journal:'Solar Energy Materials and Solar Cells',year:2014,doi:'10.1016/j.solmat.2014.07.036',url:'https://doi.org/10.1016/j.solmat.2014.07.036',chapters:['Ch.3'],cat:'Modélisation PV',importance:52},
+{n:38,key:'Cho2014',stars:3,authors:'Cho K. et al.',title:'Learning Phrase Representations Using RNN Encoder-Decoder (GRU)',journal:'EMNLP 2014 / arXiv',year:2014,url:'https://arxiv.org/abs/1406.1078',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:51},
+{n:39,key:'Bai2018',stars:3,authors:'Bai S., Kolter J.Z., Koltun V.',title:'An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling (TCN)',journal:'arXiv',year:2018,url:'https://arxiv.org/abs/1803.01271',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:50},
+{n:40,key:'Bahdanau2015',stars:3,authors:'Bahdanau D., Cho K., Bengio Y.',title:'Neural Machine Translation by Jointly Learning to Align and Translate (Attention)',journal:'ICLR 2015',year:2015,url:'https://arxiv.org/abs/1409.0473',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:49},
+{n:41,key:'paris2015',stars:2,authors:'UNFCCC',title:'Paris Agreement (Accord de Paris — COP21)',journal:'United Nations',year:2015,url:'https://unfccc.int/process-and-meetings/the-paris-agreement',chapters:['Ch.1'],cat:'Contexte Énergie',importance:42},
+{n:42,key:'IPCC2023SR15',stars:2,authors:'IPCC',title:'Climate Change 2023: Synthesis Report',journal:'IPCC Geneva',year:2023,url:'https://www.ipcc.ch/report/ar6/syr/',chapters:['Ch.1'],cat:'Contexte Énergie',importance:41},
+{n:43,key:'irena2024cost',stars:2,authors:'IRENA',title:'Renewable Power Generation Costs in 2023',journal:'IRENA Abu Dhabi',year:2024,url:'https://www.irena.org/Publications/2024/Sep/Renewable-Power-Generation-Costs-in-2023',chapters:['Ch.1'],cat:'Contexte Énergie',importance:40},
+{n:44,key:'worldbank2023tunisia',stars:2,authors:'World Bank Group',title:'Green, Affordable and Viable Energy Production in Tunisia',journal:'World Bank',year:2023,url:'https://www.worldbank.org/en/programs/teri/brief/green-affordable-and-viable-energy-production-tunisia',chapters:['Ch.1'],cat:'Contexte Tunisie',importance:39},
+{n:45,key:'Swanson2006',stars:2,authors:'Swanson R.M.',title:'A Vision for Crystalline Silicon Photovoltaics (Loi de Swanson)',journal:'Progress in Photovoltaics',year:2006,url:'https://onlinelibrary.wiley.com/doi/10.1002/pip.681',chapters:['Ch.1'],cat:'Physique PV',importance:38},
+{n:46,key:'Eltawil2010',stars:2,authors:'Eltawil M.A., Zhao Z.',title:'MPPT Techniques for Photovoltaic Applications',journal:'Renewable & Sustainable Energy Reviews',year:2010,doi:'10.1016/j.rser.2010.02.009',url:'https://doi.org/10.1016/j.rser.2010.02.009',chapters:['Ch.1','Ch.4'],cat:'MPPT Classique',importance:37},
+{n:47,key:'Ishaque2012PSO',stars:2,authors:'Ishaque K., Salam Z., Amjad M., Mekhilef S.',title:'An Improved Particle Swarm Optimization (PSO)-Based MPPT for PV With Reduced Steady-State Oscillation',journal:'IEEE Trans. Power Electronics',year:2012,doi:'10.1109/TPEL.2012.2185713',url:'https://doi.org/10.1109/TPEL.2012.2185713',chapters:['Ch.1'],cat:'Méta-heuristique',importance:36},
+{n:48,key:'Sze2006',stars:2,authors:'Sze S.M., Ng K.K.',title:'Physics of Semiconductor Devices (3rd ed.)',journal:'John Wiley & Sons',year:2006,url:'https://www.wiley.com/en-us/Physics+of+Semiconductor+Devices%2C+3rd+Edition-p-9780471143239',chapters:['Ch.1','Ch.3'],cat:'Physique PV',importance:35},
+{n:49,key:'Neamen2011',stars:2,authors:'Neamen D.A.',title:'Semiconductor Physics and Devices: Basic Principles (4th ed.)',journal:'McGraw-Hill',year:2011,url:'https://www.mheducation.com/highered/product/semiconductor-physics-devices-basic-principles-neamen/M9780073529585.html',chapters:['Ch.1'],cat:'Physique PV',importance:34},
+{n:50,key:'Graves2005',stars:2,authors:'Graves A., Schmidhuber J.',title:'Framewise Phoneme Classification with Bidirectional LSTM',journal:'Neural Networks',year:2005,doi:'10.1016/j.neunet.2005.06.042',url:'https://doi.org/10.1016/j.neunet.2005.06.042',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:33},
+{n:51,key:'BPSOLAR2010',stars:2,authors:'BP Solar',title:'BP 485J — 85 Watt Photovoltaic Module Datasheet',journal:'BP Solar Technical Datasheet',year:2010,url:'https://www.pvresources.com/en/siliconmodules/bpsolar/BP485J.php',chapters:['Ch.1','Ch.3','Ch.4'],cat:'Module PV',importance:32},
+{n:52,key:'Zhu2019RL_MPPT',stars:2,authors:'Zhu L., He X.',title:'An Intelligent Reinforcement Learning-Based Maximum Power Point Tracking Method for Photovoltaic Systems',journal:'IEEE Trans. Industrial Electronics',year:2019,doi:'10.1109/TIE.2018.2883023',url:'https://doi.org/10.1109/TIE.2018.2883023',chapters:['Ch.1'],cat:'IA / Deep Learning',importance:31},
+{n:53,key:'mellit2021deep',stars:2,authors:'Mellit A., Kalogirou S.A.',title:'Deep Learning Neural Networks for Short-Term Photovoltaic Power Forecasting',journal:'Renewable Energy',year:2021,doi:'10.1016/j.renene.2021.02.166',url:'https://doi.org/10.1016/j.renene.2021.02.166',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:30},
+{n:54,key:'King2004',stars:2,authors:'King D.L., Boyson W.E. et al.',title:'Photovoltaic Array Performance Model (Sandia)',journal:'Sandia National Laboratories',year:2004,url:'https://pvpmc.sandia.gov/modeling-steps/2-dc-module-iv/point-value-models/sandia-pv-array-performance-model/',chapters:['Ch.5'],cat:'Modélisation PV',importance:29},
+{n:55,key:'Messalti2017',stars:2,authors:'Messalti S., Harrag A., Loukriz A.',title:'A New Variable Step Size Neural Networks MPPT Controller: Review, Simulation and Hardware Implementation',journal:'Renewable & Sustainable Energy Reviews',year:2017,doi:'10.1016/j.rser.2016.09.092',url:'https://doi.org/10.1016/j.rser.2016.09.092',chapters:['Ch.1'],cat:'IA / Deep Learning',importance:28},
+{n:56,key:'Mohanty2016',stars:2,authors:'Mohanty S., Subudhi B., Ray P.K.',title:'A New MPPT Design Using Grey Wolf Optimization Technique for Photovoltaic System Under Partial Shading Conditions',journal:'IEEE Trans. Sustainable Energy',year:2016,doi:'10.1109/TSTE.2015.2482120',url:'https://doi.org/10.1109/TSTE.2015.2482120',chapters:['Ch.1'],cat:'Méta-heuristique',importance:27},
+{n:57,key:'BirdRiordan1984',stars:2,authors:'Bird R.E., Riordan C.',title:'Simple Solar Spectral Model for Direct and Diffuse Irradiance (SPECTRL2)',journal:'Journal of Climate & Applied Meteorology',year:1984,doi:'10.1175/1520-0450(1984)023<0182:SSSMFD>2.0.CO;2',url:'https://doi.org/10.1175/1520-0450(1984)023',chapters:['Ch.2'],cat:'Rayonnement Solaire',importance:26},
+{n:58,key:'sera2007',stars:2,authors:'Sera D., Teodorescu R., Rodriguez P.',title:'PV Panel Model Based on Datasheet Values',journal:'IEEE ISIE 2007',year:2007,doi:'10.1109/ISIE.2007.4374981',url:'https://doi.org/10.1109/ISIE.2007.4374981',chapters:['Ch.1','Ch.3'],cat:'Modélisation PV',importance:25},
+{n:59,key:'becquerel1839',stars:1,authors:'Becquerel A.E.',title:'Mémoire sur les effets électriques produits sous l\'influence des rayons solaires',journal:'Comptes Rendus Académie des Sciences',year:1839,url:'https://gallica.bnf.fr/',chapters:['Ch.1'],cat:'Histoire PV',importance:15},
+{n:60,key:'einstein1905',stars:1,authors:'Einstein A.',title:'Über einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt (Effet photoélectrique)',journal:'Annalen der Physik',year:1905,doi:'10.1002/andp.19053220607',url:'https://doi.org/10.1002/andp.19053220607',chapters:['Ch.1'],cat:'Histoire PV',importance:14},
+{n:61,key:'bellabs1954',stars:1,authors:'Chapin D.M., Fuller C.S., Pearson G.L.',title:'A New Silicon p-n Junction Photocell for Converting Solar Radiation into Electrical Power (Bell Labs)',journal:'Bell Telephone Laboratories',year:1954,url:'https://ethw.org/Milestones:First_Practical_Photovoltaic_Solar_Cell',chapters:['Ch.1'],cat:'Histoire PV',importance:13},
+{n:62,key:'nrel2025',stars:1,authors:'National Renewable Energy Laboratory',title:'Best Research-Cell Efficiency Chart',journal:'NREL',year:2025,url:'https://www.nrel.gov/pv/cell-efficiency.html',chapters:['Ch.1'],cat:'Physique PV',importance:12},
+{n:63,key:'steg2024',stars:1,authors:'STEG',title:'Rapport Annuel 2024 — Société Tunisienne de l\'Électricité et du Gaz',journal:'STEG Tunis',year:2024,url:'https://www.steg.com.tn/',chapters:['Ch.1'],cat:'Contexte Tunisie',importance:11},
+{n:64,key:'ANME2022',stars:1,authors:'Agence Nationale pour la Maîtrise de l\'Énergie',title:'Bilan Énergétique de la Tunisie 2022',journal:'ANME Tunis',year:2022,url:'https://www.anme.tn/',chapters:['Ch.1'],cat:'Contexte Tunisie',importance:10},
+{n:65,key:'CRTEn2023',stars:1,authors:'Centre de Recherches et Technologies de l\'Énergie',title:'Rapport d\'Activités 2022-2023 — Technopole de Borj Cédria',journal:'CRTEn',year:2023,url:'https://www.crten.rnrt.tn/',chapters:['Ch.1','Ch.2','Ch.3'],cat:'Contexte Tunisie',importance:9},
+{n:66,key:'solargis',stars:1,authors:'Solargis / World Bank ESMAP',title:'Solar Resource Maps and GIS Data for Tunisia — Global Solar Atlas',journal:'Solargis',year:2024,url:'https://solargis.com/maps-and-gis-data/download/tunisia',chapters:['Ch.1','Ch.2'],cat:'Rayonnement Solaire',importance:8},
+{n:67,key:'Glorot2010',stars:1,authors:'Glorot X., Bengio Y.',title:'Understanding the Difficulty of Training Deep Feedforward Neural Networks',journal:'AISTATS 2010',year:2010,url:'https://proceedings.mlr.press/v9/glorot10a.html',chapters:['Ch.5'],cat:'IA / Deep Learning',importance:7},
+{n:68,key:'luque2011',stars:1,authors:'Luque A., Hegedus S. (Eds.)',title:'Handbook of Photovoltaic Science and Engineering (2nd ed.)',journal:'John Wiley & Sons',year:2011,url:'https://www.wiley.com/en-us/Handbook+of+Photovoltaic+Science+and+Engineering%2C+2nd+Edition-p-9780470721698',chapters:['Ch.1','Ch.3'],cat:'Physique PV',importance:6}
+];
+
+// Category colors
+const CAT_COLORS={'Modélisation PV':'#34D399','MPPT Classique':'#F87171','IA / Deep Learning':'#A78BFA','Méta-heuristique':'#FB923C','Physique PV':'#38BDF8','Contexte Énergie':'#FCD34D','Contexte Tunisie':'#FDE68A','Données / Météo':'#7DD3FC','Rayonnement Solaire':'#FBBF24','Histoire PV':'#D1D5DB','Module PV':'#6EE7B7','MPPT Ombrage':'#F9A8D4'};
+
+// Build reference list
+function buildRefList(){
+  const list=document.getElementById('ref-list');
+  // Group by category
+  const cats={};
+  REFS.forEach(r=>{if(!cats[r.cat])cats[r.cat]=[];cats[r.cat].push(r);});
+  const catOrder=['MPPT Classique','IA / Deep Learning','Modélisation PV','Physique PV','Méta-heuristique','Données / Météo','Rayonnement Solaire','Contexte Énergie','Contexte Tunisie','Module PV','MPPT Ombrage','Histoire PV'];
+  let html='';
+  catOrder.forEach(cat=>{
+    if(!cats[cat])return;
+    const cc=CAT_COLORS[cat]||'#888';
+    html+=`<div class="ref-section"><div class="ref-section-title" style="color:${cc}99;border-color:${cc}20">${cat} <span style="color:rgba(255,255,255,0.15)">(${cats[cat].length})</span></div>`;
+    cats[cat].forEach(r=>{
+      const stars='★'.repeat(r.stars)+'☆'.repeat(5-r.stars);
+      const impPct=r.importance;
+      const doi=r.doi?`<a class="ref-doi-link" href="https://doi.org/${r.doi}" target="_blank">DOI ↗</a>`:'';
+      const urlLink=!r.doi&&r.url?`<a class="ref-doi-link" href="${r.url}" target="_blank">Lien ↗</a>`:'';
+      const chTags=r.chapters.map(c=>`<span class="ref-ch-tag" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.35)">${c}</span>`).join('');
+      const titleContent=r.url?`<a href="${r.url}" target="_blank">${r.title}</a>`:r.title;
+      html+=`<div class="ref-item" data-stars="${r.stars}" data-search="${r.authors.toLowerCase()} ${r.title.toLowerCase()} ${r.journal.toLowerCase()} ${r.key.toLowerCase()} ${r.year}">
+        <div class="ref-top">
+          <div class="ref-num">[${r.n}]</div>
+          <div class="ref-title-block">
+            <div class="ref-title">${titleContent}</div>
+            <div class="ref-authors">${r.authors}</div>
+          </div>
+          <div style="flex-shrink:0;text-align:right">
+            <div class="stars" title="Importance: ${r.stars}/5 étoiles">${stars}</div>
+          </div>
+        </div>
+        <div class="ref-meta">
+          <span class="ref-journal">${r.journal}</span>
+          <span class="ref-year">${r.year}</span>
+          ${doi}${urlLink}
+          ${chTags}
+        </div>
+        <div class="importance-bar">
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,0.2);width:64px">Importance</div>
+          <div class="imp-bar-bg"><div class="imp-bar-fill" style="width:${impPct}%;background:linear-gradient(90deg,${cc},${cc}88)"></div></div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:${cc};min-width:28px;text-align:right">${impPct}%</div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  list.innerHTML=html;
+}
+
+// Reference search/filter
+let activeStarFilter='all';
+document.getElementById('ref-search').addEventListener('input',function(){filterRefs();});
+document.querySelectorAll('.rfilter').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.rfilter').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    activeStarFilter=this.dataset.filter;
+    filterRefs();
+  });
+});
+function filterRefs(){
+  const q=document.getElementById('ref-search').value.trim().toLowerCase();
+  document.querySelectorAll('.ref-item').forEach(item=>{
+    const searchText=item.dataset.search||'';
+    const stars=parseInt(item.dataset.stars)||0;
+    const matchSearch=!q||searchText.includes(q);
+    const matchStar=activeStarFilter==='all'||stars===parseInt(activeStarFilter);
+    item.classList.toggle('hidden',!(matchSearch&&matchStar));
+  });
+}
+
+// Modal controls
+document.getElementById('btn-refs').addEventListener('click',()=>{document.getElementById('ref-modal').classList.add('open');});
+document.getElementById('ref-modal-close').addEventListener('click',()=>{document.getElementById('ref-modal').classList.remove('open');});
+document.getElementById('ref-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+
+// Build on load
+buildRefList();
+
+</script>
+<script>
+// ── CANVAS MIND MAP ────────────────────────────────────────────────────────
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+let W=window.innerWidth,H=window.innerHeight;
+canvas.width=W;canvas.height=H;
+
+const RAW=[
+{id:'root',label:'MPPT · IA\nPhotovoltaïque',sub:'Essalami 2025 · ENIGA/CRTEn · Borj Cédria',type:'root',r:58,col:'#F59E0B',parent:null,
+ info:{facts:['Mémoire de fin d\'études — Ingénieur Électrique','Institut: ENIGA / LPV-CRTEn (Tunis-Nord)','Module référence: BP Solar 485J (85W monocristallin)','Objectif: MPPT intelligent par IA pour conditions tunisiennes'],formula:null}},
+{id:'ch1',label:'État\nde l\'art',sub:'Ch.1 — Contexte, physique PV, méthodes MPPT',type:'chapter',r:44,col:'#38BDF8',parent:'root',
+ info:{facts:['Revue de 68 références bibliographiques','De la physique PV aux méthodes IA avancées','Cadre contextuel: crise énergétique tunisienne','Positionnement: 4 questions de recherche ouvertes'],formula:null}},
+{id:'ch2',label:'Gisement\nSolaire',sub:'Ch.2 — SPECTRL2 · Borj Cédria · Atmosphère',type:'chapter',r:44,col:'#FBBF24',parent:'root',
+ info:{facts:['Modèle spectral SPECTRL2 (Bird & Riordan, 1984)','Plage 300–4000 nm, 122 bandes spectrales','Site Borj Cédria: 36.72°N, 10.33°E','GHI annuel moyen: 1870 kWh/m²/an'],formula:null}},
+{id:'ch3',label:'Modélisation\nBP 485J',sub:'Ch.3 — SDM, DDM, dégradation',type:'chapter',r:44,col:'#34D399',parent:'root',
+ info:{facts:['Circuits équivalents: SDM, DDM, TDM','Extraction par évolution différentielle (DE)','Module neuf STC: 85.2 W','Module vieilli Borj Cédria: 57.97 W (−32%)'],formula:null}},
+{id:'ch4',label:'MPPT\nConventionnel',sub:'Ch.4 — P&O, INC, HC, ombrage partiel',type:'chapter',r:44,col:'#F87171',parent:'root',
+ info:{facts:['Réseau 3×10 modules BP485J (2552.5 W)','5 variantes P&O + 5 variantes INC','Simulation MATLAB/Simulink complète','Analyse ombrage partiel: GMPP vs LMPP'],formula:null}},
+{id:'ch5',label:'Deep\nLearning',sub:'Ch.5 — 12 architectures · NSRDB 18 ans',type:'chapter',r:44,col:'#A78BFA',parent:'root',
+ info:{facts:['12 architectures réseaux profonds comparées','Données NSRDB 2005–2022 (631 104 points)','Deep MLP dominant (connexions résiduelles)','ANN dédié: 3873 paramètres, 15 features'],formula:null}},
+{id:'ch1_energie',label:'Contexte\nÉnergétique',sub:'620 EJ · 37 Gt CO₂ · Paris 2015',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['Demande mondiale: 620 EJ en 2023','80% satisfaite par combustibles fossiles','Accord de Paris: limiter +1.5°C','GIEC: −45% CO₂ avant 2030, net zéro 2050'],formula:null}},
+{id:'ch1_tunisie',label:'Tunisie\nÉnergétique',sub:'93.7% fossile · PST · 787 MW installés',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['Production électrique 2024: 19 395 GWh','93.7% énergie: gaz naturel','PST objectif 2030: 3815 MW renouvelable','Installé juin 2025: 787 MW (retard −79%)'],formula:null}},
+{id:'ch1_potentiel',label:'Potentiel\nSolaire TN',sub:'GHI 1800–2300 · 840 GW technique',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['GHI moyen national: 1900 kWh/m²/an','Potentiel technique: 840 GW (160× la demande)','2800–3200 h ensoleillement/an','Allemagne: GHI seulement 1050 kWh/m²/an'],formula:null}},
+{id:'ch1_histoire',label:'Histoire\nPhotovoltaïque',sub:'1839–2025 · Becquerel → Fraunhofer 47.6%',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['1839: Becquerel découvre l\'effet PV','1954: Bell Labs — cellule Si 6% (p-n junction)','2017: Kaneka monocristallin 26.7%','2025: Fraunhofer ISE multi-jonction 47.6%'],formula:'Limite Shockley-Queisser jonction simple Si: 33.7%'}},
+{id:'ch1_bp485j',label:'BP Solar\n485J',sub:'85W · η=13.1% · 36 cellules Si mono',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['Puissance STC: 85 W (Pmpp)','Voc=22.2V, Isc=5.1A, FF=0.750','36 cellules monocristallines en série','αIsc=+0.065%/K, βVoc=−0.36%/K'],formula:'FF = Pmpp/(Isc·Voc) = 17.8×4.78/(5.10×22.2) = 0.750'}},
+{id:'ch1_sdm',label:'Modèle\nSDM 5P',sub:'Mono-diode · équation transcendante',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['5 paramètres: Iph, I0, n, Rs, Rsh','Extraction: Newton-Raphson + scipy.fsolve','Précision globale: < 2%','Standard de la simulation PV'],formula:'I = Iph − I₀[exp((V+IRs)/nVth)−1] − (V+IRs)/Rsh'}},
+{id:'ch1_ddm',label:'Modèle\nDDM 7P',sub:'Double diode · précision faible G',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['7 paramètres: I01, I02, n1=1, n2=2, Rs, Rsh, Iph','Modélise recombinaisons zone de déplétion (SRH)','Supérieur sous G < 400 W/m² et ombrage','Meilleur compromis précision/complexité'],formula:'I = Iph − I01[e^(V+IRs/n1Vth)−1] − I02[e^(V+IRs/n2Vth)−1] − (V+IRs)/Rsh'}},
+{id:'ch1_mppt_conv',label:'MPPT\nClassiques',sub:'P&O · IncCond · FOCV · FSCC',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['P&O: η=96–98%, oscillations 1–3%','IncCond: dI/dV=−I/V, moins d\'oscillations','FOCV: Vmpp≈0.71–0.80×Voc (interruption)','Limite: tous aveuglés par l\'ombrage partiel'],formula:'ηMPPT = ∫₀ᵀ Pactual(t)dt / ∫₀ᵀ Pmax(t)dt × 100%'}},
+{id:'ch1_heuristique',label:'MPPT\nHeuristique',sub:'PSO · GWO · FLC · optimisation globale',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['PSO: essaim de particules (97–99%)','GWO: hiérarchie loups gris α/β/δ/ω','FLC: pas adaptatif via règles linguistiques','IC-FLC (Melhaoui): η=97.7%, tc=53.5ms'],formula:'PSO: vi(k+1) = w·vi(k) + c1r1(pbest−xi) + c2r2(gbest−xi)'}},
+{id:'ch1_ia',label:'IA pour\nMPPT',sub:'ANN · LSTM · SVM · RL-DQN',type:'sub',r:30,col:'#7DD3FC',parent:'ch1',info:{facts:['ANN-MLP (G,T→Vmpp): η=99–99.8%','LSTM: prédictif, séries temporelles > 99%','SVM-RBF: noyau gaussien, convergence garantie','RL-DQN: apprentissage sans modèle PV'],formula:'LSTM gate: ft = σ(Wf[ht-1,xt]+bf) (porte d\'oubli)'}},
+{id:'ch2_cste_sol',label:'Constante\nSolaire',sub:'1361.1 W/m² · mission SORCE · WMO',type:'sub',r:30,col:'#FCD34D',parent:'ch2',info:{facts:['Valeur WMO: 1361.1 ± 0.5 W/m²','Correction excentricité orbitale: ±3.3%','Facteur E0(n) par série de Fourier (Spencer)','Spectre AM0: maximum vers 500 nm (vert)'],formula:'I0(n) = Isc·E0(n)\nE0 = 1.000110 + 0.034221·cosB + 0.001280·sinB…'}},
+{id:'ch2_geo',label:'Géométrie\nSolaire',sub:'Déclinaison · Horaire · Zénith · Masse air',type:'sub',r:30,col:'#FCD34D',parent:'ch2',info:{facts:['Déclinaison δ: −23.45° à +23.45°','Angle zénithal Tunis: 13.3°–60.1° (midi)','Masse d\'air: formule Kasten-Young 1989','Beer-Bouguer-Lambert: atténuation spectrale'],formula:'cosθz = sinφ·sinδ + cosφ·cosδ·cosω\nmr = [cosθz + 0.50572·(96.08−θz)^−1.6364]^−1'}},
+{id:'ch2_spectrl2',label:'SPECTRL2\nBird 1984',sub:'122 bandes · 300–4000 nm · Rayleigh+Mie',type:'sub',r:30,col:'#FCD34D',parent:'ch2',info:{facts:['Modèle spectral analytique Bird & Riordan 1984','122 bandes spectrales de 300 à 4000 nm','Transmittances: Rayleigh, aérosols, O3, H2O, O2, CO2','Validé sur données pyranométriques Tunis'],formula:'Iλ = H0(λ)·E0·exp(−mr·τλ,tot)'}},
+{id:'ch2_borj',label:'Borj Cédria\nLPV-CRTEn',sub:'36.72°N · 1870 kWh/m²/an · brume marine',type:'sub',r:30,col:'#FCD34D',parent:'ch2',info:{facts:['Latitude: 36.716°N, Longitude: 10.426°E','GHI annuel: 1870 kWh/m²/an','Température: 5°C (hiver) à 40°C (été)','Brume marine: profils irradiance complexes'],formula:null}},
+{id:'ch2_atlas',label:'Atlas Solaire\nTunisie',sub:'Solargis · GHI 1800–2300 kWh/m²/an',type:'sub',r:30,col:'#FCD34D',parent:'ch2',info:{facts:['Données: Solargis / Banque Mondiale ESMAP','GHI nord: 1800 kWh/m²/an','GHI sud (Tataouine/Kébili): 2300+ kWh/m²/an','Potentiel technique: 840 GW (vs 3-4 GW en Allemagne)'],formula:null}},
+{id:'ch3_jonction',label:'Jonction\np-n',sub:'Shockley · Eg=1.12 eV · gap Si',type:'sub',r:30,col:'#6EE7B7',parent:'ch3',info:{facts:['Gap Si cristallin: Eg = 1.12 eV (λseuil ≈ 1100 nm)','Zone de charge d\'espace (ZCE): champ ~10⁴ V/cm','Facteur idéalité n: 1 (diffusion) à 2 (ZCE)','Mécanisme SRH (Shockley-Read-Hall) sous dégradation'],formula:'ID = I₀[exp(qV/nkT) − 1]\nVt = NskT/q = 36 × 25.7mV ≈ 0.925V (25°C)'}},
+{id:'ch3_sdm_ext',label:'Extraction\nSDM Newton',sub:'scipy.fsolve · 5 équations STC/NOCT',type:'sub',r:30,col:'#6EE7B7',parent:'ch3',info:{facts:['Conditions STC: G=1000W/m², T=25°C','Conditions NOCT: G=800W/m², T_amb=20°C','Système de 5 équations non-linéaires','Résolution: Newton-Raphson (scipy.optimize.fsolve)'],formula:'I|V=0 = Isc, I|V=Voc = 0\nI|V=Vmpp = Impp, dP/dV|Vmpp = 0'}},
+{id:'ch3_de',label:'Évolution\nDifférentielle',sub:'DE · extraction paramétrique globale',type:'sub',r:30,col:'#6EE7B7',parent:'ch3',info:{facts:['Algorithme DE: optimisation globale heuristique','Évite les minima locaux (vs Newton-Raphson)','7 paramètres DDM extraits simultanément','Module neuf: 85.2W (STC), erreur < 0.5%'],formula:'x_trial = x_r1 + F·(x_r2 − x_r3)\nAccepté si f(x_trial) < f(x_current)'}},
+{id:'ch3_degradation',label:'Diagnostic\nDégradation',sub:'Neuf 85.2W → Vieilli 57.97W (−32%)',type:'sub',r:30,col:'#6EE7B7',parent:'ch3',info:{facts:['Rs neuf: 0.003 Ω → Rs vieilli: 0.526 Ω (+19843%)','n neuf: 1.22 → n vieilli: 1.51 (+23.9%)','Rsh neuf: 57.5 Ω → Rsh vieilli: 12.3 Ω (fuite)','Âge estimé par modèle dégradation: 34 ± 20 ans'],formula:null}},
+{id:'ch3_env',label:'Effets\nEnvironnementaux',sub:'G · T · Ombrage · NOCT',type:'sub',r:30,col:'#6EE7B7',parent:'ch3',info:{facts:['Irradiance G: Pmpp ∝ G (quasi-linéaire)','Température: βVoc = −0.36%/K, γP = −0.5%/K','Tcell max été Tunisie: 65°C → pertes 15–20%','Ombrage partiel: maxima multiples P-V (2 bypass BP485J)'],formula:'Iph(G,T) = [Iph_STC + αIsc(T−TSTC)]·G/GSTC\nTcell = Tamb + (G/800)·(TNOCT − 20)'}},
+{id:'ch4_reseau',label:'Réseau\n3×10 Modules',sub:'2552.5 W crête · 222V · 16A',type:'sub',r:30,col:'#FCA5A5',parent:'ch4',info:{facts:['Configuration: 10 modules série × 3 chaînes parallèle','Puissance crête STC: 2552.5 W','Voc réseau: 10×22.2 = 222 V','Isc réseau: 3×5.35 = 16.05 A'],formula:'Pmax(G,T) = PPM·(G/GSTC)·[1+γP(T−TSTC)]'}},
+{id:'ch4_po',label:'P&O\n5 variantes',sub:'P01–P05 · η=94.9% · Pmoy=2424W',type:'sub',r:30,col:'#FCA5A5',parent:'ch4',info:{facts:['P01: classique pas fixe ΔD=const (référence)','P02: pas variable (adaptatif)','P03: oscillation nulle (convergence parfaite)','P04: espace restreint, P05: exponentiel mémoire'],formula:'if ΔP>0 → D(k+1)=D(k)+ΔD\nif ΔP<0 → D(k+1)=D(k)−ΔD'}},
+{id:'ch4_inc',label:'INC\n5 variantes',sub:'dI/dV=−I/V au MPP · INC1–INC5',type:'sub',r:30,col:'#FCA5A5',parent:'ch4',info:{facts:['Fondement analytique: dP/dV=0 ⟺ dI/dV=−I/V','INC1: standard, INC2: pas variable','INC3–INC5: variantes adaptatives avancées','Plus robuste au bruit que P&O en théorie'],formula:'dI/dV > −I/V → MPP à droite\ndI/dV = −I/V → MPP atteint ✓\ndI/dV < −I/V → MPP à gauche'}},
+{id:'ch4_frac',label:'Méthodes\nFractionnaires',sub:'FOCV: Vmpp≈0.71Voc · FSCC: Impp≈0.85Isc',type:'sub',r:30,col:'#FCA5A5',parent:'ch4',info:{facts:['FOCV: Vmpp ≈ kV × Voc, kV ≈ 0.71–0.80','FSCC: Impp ≈ kI × Isc, kI ≈ 0.78–0.92','Très simple: une relation empirique','Inconvénient: interruption périodique de la charge'],formula:'Vmpp ≈ kV·Voc ≈ 0.71–0.80 × Voc\nImpp ≈ kI·Isc ≈ 0.78–0.92 × Isc'}},
+{id:'ch4_hc',label:'Hill\nClimbing',sub:'Gradient discret · rapport cyclique DC-DC',type:'sub',r:30,col:'#FCA5A5',parent:'ch4',info:{facts:['Perturbation directe du rapport cyclique ΔD','Analogue au P&O (domaine D vs domaine V)','Pas fixe: compromis vitesse vs oscillations','Même limitations structurelles que P&O'],formula:'D(k+1) = D(k) ± ΔD\nΔD = sign(ΔP)·ΔD_const'}},
+{id:'ch4_ombrage',label:'Ombrage\nPartiel',sub:'GMPP vs LMPP · balayage P-V complet',type:'sub',r:30,col:'#FCA5A5',parent:'ch4',info:{facts:['BP485J: 2 diodes bypass (1 pour 18 cellules)','Courbe P-V: maxima locaux (LMPP) + global (GMPP)','P&O et INC: convergent vers le premier LMPP','Solution: balayage P-V complet ou méthode IA'],formula:null}},
+{id:'ch5_data',label:'NSRDB\n18 ans',sub:'631,104 pts · 2005–2022 · Tunis 36.69°N',type:'sub',r:30,col:'#C4B5FD',parent:'ch5',info:{facts:['Source: NSRDB (Sengupta et al., 2018)','Localisation: 36.69°N, 10.38°E (Tunis)','Période: 2005–2022 = 18 années complètes','631,104 enregistrements horaires (0 manquant)'],formula:'Split: 441,772 train + 94,666 val + 94,666 test'}},
+{id:'ch5_preprocess',label:'Ingénierie\nFeatures',sub:'15 variables · encodage cyclique sin/cos',type:'sub',r:30,col:'#C4B5FD',parent:'ch5',info:{facts:['8 variables physiques: GHI, DNI, DHI, T, P, Vent, HR, Zénith','6 variables temporelles cycliques (sin/cos)','Normalisation Min-Max sur train uniquement','Encodage cyclique: continuité différentiable jan↔déc'],formula:'h_sin = sin(2π·h/24), h_cos = cos(2π·h/24)\nm_sin = sin(2π·m/12), d_sin = sin(2π·j/365)'}},
+{id:'ch5_12arch',label:'12\nArchitectures',sub:'MLP · LSTM · GRU · CNN · Transformer · XGB',type:'sub',r:30,col:'#C4B5FD',parent:'ch5',info:{facts:['Deep MLP + connexions résiduelles (BEST)','LSTM, BiLSTM, GRU, BiGRU (récurrentes)','CNN-LSTM, CNN-BiLSTM, CNN-GRU (hybrides)','Attention-BiLSTM, TCN, Transformer, Stacking XGB'],formula:null}},
+{id:'ch5_deepmlp',label:'Deep MLP\nDominant',sub:'Connexions résiduelles · R²→1.0',type:'sub',r:30,col:'#C4B5FD',parent:'ch5',info:{facts:['Meilleure performance parmi 12 architectures','Connexions résiduelles: gradient flow amélioré','PV = données non-séquentielles → MLP gagne sur LSTM','R² très proche de 1.0 sur test set 18 ans'],formula:'a^(ℓ) = f(W^(ℓ)·a^(ℓ-1) + b^(ℓ)) + a^(ℓ-2)  (résidu)'}},
+{id:'ch5_lstm',label:'LSTM\nBiLSTM GRU',sub:'Portes mémoire · fenêtre 24 pas',type:'sub',r:30,col:'#C4B5FD',parent:'ch5',info:{facts:['4 portes: oubli, entrée, état candidat, sortie','BiLSTM: lecture bidirectionnelle (avant + arrière)','GRU: 2 portes, plus léger (reset + update)','Séquences de 24 pas temporels (24h)'],formula:'ft = σ(Wf[ht-1,xt]+bf)  (oubli)\nct = ft⊙ct-1 + it⊙c̃t  (état cellule)'}},
+{id:'ch5_ann',label:'ANN Dédié\nVolet B',sub:'3873 params · 15 features · 18 ans',type:'sub',r:30,col:'#C4B5FD',parent:'ch5',info:{facts:['Architecture optimisée: 3873 paramètres','15 variables d\'entrée (8 physiques + 6 cycliques + 1)','Analyse importance: GHI > DNI > Zénith > T','Stabilité inter-annuelle validée sur 18 ans'],formula:'PPV = G·A·η₀·[1+γT(Tc−25)]·ηsys\nA=1.6m², η₀=18%, γT=−0.45%/°C, ηsys=85%'}}
+];
+
+const nodeMap={};
+RAW.forEach(n=>nodeMap[n.id]=n);
+const nodes=[];const edges=[];const nodeById={};
+const chA={ch1:0,ch2:72,ch3:144,ch4:216,ch5:288};
+const CX=W/2,CY=H/2+30;
+
+RAW.forEach(d=>{
+  let x,y;
+  if(d.type==='root'){x=CX;y=CY;}
+  else if(d.type==='chapter'){const a=chA[d.id]*Math.PI/180,R=170;x=CX+R*Math.cos(a);y=CY+R*Math.sin(a);}
+  else{
+    const pId=d.parent,pD=RAW.find(n=>n.id===pId);
+    const sibs=RAW.filter(n=>n.parent===pId);
+    const idx=sibs.indexOf(d),tot=sibs.length;
+    const pA=pD.type==='root'?0:chA[pId]*Math.PI/180;
+    const sp=Math.PI*1.05,sa=pA-sp/2;
+    const a=tot===1?pA:sa+idx*(sp/Math.max(tot-1,1));
+    const R=240;x=CX+R*Math.cos(a);y=CY+R*Math.sin(a);
+  }
+  const n={...d,x,y,vx:0,vy:0,fx:0,fy:0,scale:1,highlighted:true,visible:true};
+  nodes.push(n);nodeById[d.id]=n;
+});
+RAW.forEach(d=>{
+  if(d.parent){edges.push({source:nodeById[d.parent],target:nodeById[d.id],type:d.type==='chapter'?'major':'minor'});}
+});
+
+const STARS=[];
+for(let i=0;i<350;i++)STARS.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.3,a:Math.random()*0.5+0.1,tw:Math.random()*2+1});
+
+const KS=0.04,KR=18000,DAMP=0.85,DT=0.65;
+function simulate(){
+  const vis=nodes.filter(n=>n.visible);
+  vis.forEach(n=>{n.fx=0;n.fy=0;});
+  for(let i=0;i<vis.length;i++)for(let j=i+1;j<vis.length;j++){
+    const a=vis[i],b=vis[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy+1,f=KR/d2,dd=Math.sqrt(d2),fx=f*dx/dd,fy=f*dy/dd;
+    a.fx+=fx;a.fy+=fy;b.fx-=fx;b.fy-=fy;
+  }
+  edges.forEach(e=>{
+    if(!e.source.visible||!e.target.visible)return;
+    const dx=e.target.x-e.source.x,dy=e.target.y-e.source.y,d=Math.sqrt(dx*dx+dy*dy)+0.1;
+    const rest=e.type==='major'?170:230,f=KS*(d-rest),fx=f*dx/d,fy=f*dy/d;
+    e.source.fx+=fx;e.source.fy+=fy;e.target.fx-=fx;e.target.fy-=fy;
+  });
+  vis.forEach(n=>{if(n.type!=='root'){n.fx+=(CX-n.x)*0.004;n.fy+=(CY-n.y)*0.004;}});
+  vis.forEach(n=>{if(n===dragNode)return;n.vx=(n.vx+n.fx*DT)*DAMP;n.vy=(n.vy+n.fy*DT)*DAMP;n.x+=n.vx;n.y+=n.vy;});
+}
+
+let cam={x:0,y:0,z:1},panStart=null,camStart=null,dragNode=null,dragOff={x:0,y:0},hoveredNode=null,time=0,searchActive=false;
+function toScreen(wx,wy){return{x:wx*cam.z+cam.x+(W/2)*(1-cam.z),y:wy*cam.z+cam.y+(H/2)*(1-cam.z)};}
+function toWorld(sx,sy){return{x:(sx-cam.x-(W/2)*(1-cam.z))/cam.z,y:(sy-cam.y-(H/2)*(1-cam.z))/cam.z};}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.8);
+  bg.addColorStop(0,'#060a14');bg.addColorStop(1,'#020407');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  time+=0.008;
+  STARS.forEach(s=>{const a=s.a*(0.5+0.5*Math.sin(time/s.tw+s.x));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill();});
+  ctx.save();
+  const vis=new Set(nodes.filter(n=>n.visible).map(n=>n.id));
+  edges.forEach(e=>{
+    if(!vis.has(e.source.id)||!vis.has(e.target.id))return;
+    const s=toScreen(e.source.x,e.source.y),t=toScreen(e.target.x,e.target.y);
+    const dx=t.x-s.x,dy=t.y-s.y;
+    ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.bezierCurveTo(s.x+dx*.4,s.y+dy*.1,s.x+dx*.6,s.y+dy*.9,t.x,t.y);
+    const col=e.source.col||'#555',alpha=e.type==='major'?0.4:0.18,w=e.type==='major'?1.8:0.9;
+    ctx.strokeStyle=hA(col,alpha);ctx.lineWidth=w*cam.z;ctx.shadowColor=col;ctx.shadowBlur=e.type==='major'?5:2;ctx.stroke();ctx.shadowBlur=0;
+  });
+  nodes.forEach(n=>{
+    if(!n.visible)return;
+    const p=toScreen(n.x,n.y),r=n.r*cam.z*n.scale,isH=n===hoveredNode,col=n.col;
+    const dim=searchActive&&!n.highlighted?0.2:1;
+    if(isH||n.type==='root'||n.type==='chapter'){
+      ctx.beginPath();ctx.arc(p.x,p.y,r+(isH?12:6)*cam.z,0,Math.PI*2);
+      ctx.strokeStyle=hA(col,isH?0.35:0.14);ctx.lineWidth=(isH?2:1)*cam.z;ctx.shadowColor=col;ctx.shadowBlur=isH?18:8;ctx.stroke();ctx.shadowBlur=0;
+    }
+    if(n.type==='root'){const pulse=0.6+0.4*Math.sin(time*2);ctx.beginPath();ctx.arc(p.x,p.y,r+20*cam.z*pulse,0,Math.PI*2);ctx.strokeStyle=hA(col,0.07*pulse);ctx.lineWidth=7*cam.z*pulse;ctx.stroke();}
+    const g=ctx.createRadialGradient(p.x-r*.3,p.y-r*.3,0,p.x,p.y,r);
+    const ba=isH?1:0.92;
+    g.addColorStop(0,hA(lt(col,40),ba*dim));g.addColorStop(0.6,hA(col,0.9*dim));g.addColorStop(1,hA(dk(col,30),0.85*dim));
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fillStyle=g;ctx.shadowColor=col;ctx.shadowBlur=isH?22:10;ctx.fill();ctx.shadowBlur=0;
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.strokeStyle=hA(lt(col,60),0.6*dim);ctx.lineWidth=1.2*cam.z;ctx.stroke();
+    if(r>8){
+      const fs=(n.type==='root'?13:n.type==='chapter'?11.5:9.5)*cam.z;
+      if(fs>6){
+        ctx.fillStyle=`rgba(255,255,255,${0.95*dim})`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=4;
+        const lines=n.label.split('\n'),lh=fs*1.25,oy=-(lines.length-1)*lh/2;
+        ctx.font=`600 ${fs}px 'Space Grotesk',sans-serif`;
+        lines.forEach((l,i)=>ctx.fillText(l,p.x,p.y+oy+i*lh));ctx.shadowBlur=0;
+      }
+    }
+    if(isH){ctx.beginPath();ctx.arc(p.x,p.y,r+3*cam.z,0,Math.PI*2);ctx.strokeStyle=hA(col,0.8);ctx.lineWidth=2*cam.z;ctx.stroke();}
+  });
+  ctx.restore();
+}
+
+function hA(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`;}
+function lt(hex,amt){let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);r=Math.min(255,r+amt);g=Math.min(255,g+amt);b=Math.min(255,b+amt);return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;}
+function dk(hex,amt){return lt(hex,-amt);}
+
+function loop(){simulate();draw();requestAnimationFrame(loop);}
+
+function hitTest(sx,sy){
+  const wp=toWorld(sx,sy);let best=null,bd=Infinity;
+  nodes.forEach(n=>{if(!n.visible)return;const dx=n.x-wp.x,dy=n.y-wp.y,d=Math.sqrt(dx*dx+dy*dy);if(d<n.r/cam.z*1.5&&d<bd){bd=d;best=n;}});
+  return best;
+}
+
+canvas.addEventListener('mousedown',e=>{
+  const n=hitTest(e.clientX,e.clientY);
+  if(n){dragNode=n;const wp=toWorld(e.clientX,e.clientY);dragOff={x:wp.x-n.x,y:wp.y-n.y};canvas.classList.add('dragging');}
+  else{panStart={x:e.clientX,y:e.clientY};camStart={x:cam.x,y:cam.y};canvas.classList.add('dragging');}
+});
+canvas.addEventListener('mousemove',e=>{
+  if(dragNode){const wp=toWorld(e.clientX,e.clientY);dragNode.x=wp.x-dragOff.x;dragNode.y=wp.y-dragOff.y;dragNode.vx=0;dragNode.vy=0;}
+  else if(panStart){cam.x=camStart.x+(e.clientX-panStart.x);cam.y=camStart.y+(e.clientY-panStart.y);}
+  else{hoveredNode=hitTest(e.clientX,e.clientY);canvas.style.cursor=hoveredNode?'pointer':'grab';}
+  document.getElementById('counter').textContent=`${nodes.filter(n=>n.visible).length} nœuds · ${edges.filter(e=>e.source.visible&&e.target.visible).length} arêtes · ${REFS.length} références`;
+});
+canvas.addEventListener('mouseup',e=>{
+  if(dragNode&&!panStart){
+    const wp=toWorld(e.clientX,e.clientY);
+    const dx=wp.x-(dragNode.x+dragOff.x),dy=wp.y-(dragNode.y+dragOff.y);
+    if(Math.sqrt(dx*dx+dy*dy)<5)showPanel(dragNode);
+  }
+  dragNode=null;panStart=null;canvas.classList.remove('dragging');
+});
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const factor=e.deltaY<0?1.12:0.89,newZ=Math.max(0.25,Math.min(4,cam.z*factor));
+  cam.x=e.clientX-(e.clientX-cam.x)*newZ/cam.z;
+  cam.y=e.clientY-(e.clientY-cam.y)*newZ/cam.z;
+  cam.z=newZ;
+},{passive:false});
+
+const panel=document.getElementById('panel');
+function showPanel(n){
+  const col=n.col;
+  const facts=n.info&&n.info.facts?n.info.facts.map(f=>`<div class="fact-item"><div class="fact-dot" style="background:${col}"></div><div class="fact-text">${esc(f)}</div></div>`).join(''):'';
+  const form=n.info&&n.info.formula?`<div class="pdiv"></div><div class="plabel">Équation</div><div class="formula-box">${esc(n.info.formula)}</div>`:'';
+  const types={root:'Projet',chapter:'Chapitre',sub:'Section'};
+  const chLabel=n.parent?`• ${nodeById[n.parent]?nodeById[n.parent].label.replace('\n',' '):''}`:' ENIGA / CRTEn · 2025';
+  document.getElementById('panel-content').innerHTML=`
+    <div class="panel-type">${types[n.type]||n.type}</div>
+    <div class="panel-title" style="color:${col}">${n.label.replace('\n','<br>')}</div>
+    <div class="panel-sub">${esc(n.sub)}<br><span style="color:${col}40;font-size:9px">${esc(chLabel)}</span></div>
+    <div class="pdiv"></div><div class="plabel">Points clés</div>${facts}${form}`;
+  panel.classList.add('open');
+}
+function esc(s){if(!s)return '';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+document.getElementById('panel-close').onclick=()=>panel.classList.remove('open');
+
+document.getElementById('search').addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();
+  searchActive=q.length>0;
+  if(!searchActive){nodes.forEach(n=>{n.highlighted=true;n.visible=true;});return;}
+  nodes.forEach(n=>{
+    const m=n.label.toLowerCase().includes(q)||n.sub.toLowerCase().includes(q)||
+      (n.info&&n.info.facts&&n.info.facts.some(f=>f.toLowerCase().includes(q)))||
+      (n.info&&n.info.formula&&n.info.formula.toLowerCase().includes(q));
+    n.highlighted=m;
+  });
+});
+document.getElementById('btn-reset').onclick=()=>{cam={x:0,y:0,z:1};nodes.forEach(n=>{n.visible=true;n.highlighted=true;});document.getElementById('search').value='';searchActive=false;};
+document.getElementById('btn-expand').onclick=()=>{nodes.forEach(n=>{n.visible=true;});};
+document.getElementById('btn-collapse').onclick=()=>{nodes.forEach(n=>{n.visible=n.type==='root'||n.type==='chapter';});panel.classList.remove('open');};
+
+window.addEventListener('resize',()=>{W=window.innerWidth;H=window.innerHeight;canvas.width=W;canvas.height=H;});
+
+let lastTouchDist=null;
+canvas.addEventListener('touchstart',e=>{e.preventDefault();if(e.touches.length===1){const t=e.touches[0];const n=hitTest(t.clientX,t.clientY);if(n){dragNode=n;const wp=toWorld(t.clientX,t.clientY);dragOff={x:wp.x-n.x,y:wp.y-n.y};}else{panStart={x:t.clientX,y:t.clientY};camStart={x:cam.x,y:cam.y};}}},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(lastTouchDist){const f=d/lastTouchDist;cam.z=Math.max(0.25,Math.min(4,cam.z*f));}lastTouchDist=d;}else if(e.touches.length===1){const t=e.touches[0];if(dragNode){const wp=toWorld(t.clientX,t.clientY);dragNode.x=wp.x-dragOff.x;dragNode.y=wp.y-dragOff.y;}else if(panStart){cam.x=camStart.x+(t.clientX-panStart.x);cam.y=camStart.y+(t.clientY-panStart.y);}}},{passive:false});
+canvas.addEventListener('touchend',e=>{if(e.changedTouches.length===1&&dragNode){const t=e.changedTouches[0];const wp=toWorld(t.clientX,t.clientY);const dx=wp.x-(dragNode.x+dragOff.x),dy=wp.y-(dragNode.y+dragOff.y);if(Math.sqrt(dx*dx+dy*dy)<8)showPanel(dragNode);}dragNode=null;panStart=null;lastTouchDist=null;},{passive:false});
+
+document.getElementById('counter').textContent=`${nodes.length} nœuds · ${edges.length} arêtes · ${REFS.length} références`;
+setTimeout(()=>document.getElementById('loading').classList.add('hidden'),900);
+loop();
+</script>
+</body>
+</html>
